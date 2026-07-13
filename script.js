@@ -1,4 +1,8 @@
 // This function generates a random number and assigns the reward points based on the number it gets (eg. prize 1 = 10% etc.)
+const rewards = document.getElementById('rewards');
+if (rewards) {
+    rewards.style.display = 'none'; // Initially hide the rewards container
+}
 function timer() {
     const countdownElement = document.getElementById('timeLeft');
     if (!countdownElement) {
@@ -25,13 +29,26 @@ function timer() {
             button.addEventListener('click', () => {
                 document.getElementById('rewardMessage').textContent = `You get ${rewardPoints}!`;
                 button.style.display = 'none'; // Hide the button after claiming the reward
-                const image = document.getElementById('moonstoneAd');
+                const image = document.getElementById('imageContainer');
+                const dialogueBox = document.getElementById('dialogueBox');
+                const mascotImage = document.getElementById('mascot');
                 if (image) {
                     image.style.display = 'none'; // Hide the image after claiming the reward
                 }
                 if (countdownElement) {
                     countdownElement.style.display = 'none'; // Hide the countdown text after claiming the reward
                 }
+                if (dialogueBox) {
+                    dialogueBox.style.display = 'none';
+                }
+                if (mascotImage) {
+                    mascotImage.style.display = 'none'; // Hide the mascot image after claiming the reward
+                }
+
+                if (rewards) {
+                    rewards.style.display = 'block'; // Show the rewards container after claiming the reward
+                }
+                
             }
             );
             // gives element with id the text content with the reward.
@@ -56,7 +73,72 @@ function getRandomRewardPoints() {
 }
 
 //console.log('Reward points generated:', getRandomRewardPoints());
-
-
-
 timer();
+
+/// area map code
+const dialogueBox = document.getElementById('dialogueBox');
+const dialogueMessage = document.getElementById('dialogueMessage');
+const imageMap = document.querySelector('img[usemap="#image-map"]');
+const mapAreas = document.querySelectorAll('area[id^="info"]');
+
+if (dialogueBox) {
+    dialogueBox.style.display = 'none'; // Initially hide the dialogue box
+}
+
+function scaleMapAreas() {
+    if (!imageMap || !imageMap.naturalWidth || !imageMap.naturalHeight) {
+        return;
+    }
+
+    const scaleX = imageMap.clientWidth / imageMap.naturalWidth;
+    const scaleY = imageMap.clientHeight / imageMap.naturalHeight;
+
+    mapAreas.forEach((area) => {
+        const originalCoords = area.dataset.originalCoords || area.coords;
+        area.dataset.originalCoords = originalCoords;
+
+        const scaledCoords = originalCoords
+            .split(',')
+            .map((coord, index) => {
+                const numericCoord = Number(coord.trim());
+                return Number.isNaN(numericCoord)
+                    ? coord
+                    : Math.round(numericCoord * (index % 2 === 0 ? scaleX : scaleY));
+            })
+            .join(',');
+
+        area.coords = scaledCoords;
+    });
+}
+
+mapAreas.forEach((area) => {
+    area.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const openedId = event.currentTarget.id;
+
+        if (!dialogueBox || !dialogueMessage) {
+            return;
+        }
+
+        dialogueBox.style.display = 'block';
+
+        if (openedId === 'info1') {
+            dialogueMessage.textContent = "This is the first area of the map. You can find various shops and restaurants here.";
+        } else if (openedId === 'info2') {
+            dialogueMessage.textContent = "This is the second area of the map. It contains different points of interest.";
+        } else if (openedId === 'info3') {
+            dialogueMessage.textContent = "This is the third area of the map. Explore more locations here.";
+        }
+
+        console.log('Dialog opened by:', openedId);
+    });
+});
+
+if (imageMap.complete) {
+    scaleMapAreas();
+} else {
+    imageMap.addEventListener('load', scaleMapAreas);
+}
+
+window.addEventListener('resize', scaleMapAreas);
