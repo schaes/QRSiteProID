@@ -2,7 +2,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    margin: 0;
     color: rgb(68, 51, 36);
     background-color: rgb(255, 250, 230);
     text-align: center;
@@ -66,7 +65,7 @@ img {
     position: absolute;
     width: 500px;
     height: auto;
-    transform: translate(45%,80%);
+    transform: translate(45%,105%);
 }
 
 #dialogueBox {
