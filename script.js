@@ -3,60 +3,70 @@ const rewards = document.getElementById('rewards');
 if (rewards) {
     rewards.style.display = 'none'; // Initially hide the rewards container
 }
-function timer() {
-    const countdownElement = document.getElementById('timeLeft');
+
+
+let clicked = 0;
+let toclick = 3;
+
+// to change countdown to on clicked fill quota
+function rewardGiveOut() {
+    const countdownElement = document.getElementById('timeLeft'); // the html element that will display the countdown
     if (!countdownElement) {
         return;
     }
 
-    let timeLeft = 10; // Set the countdown time in seconds
-    countdownElement.textContent = `Time left until you can claim your reward: ${timeLeft} seconds`;
+    
+    countdownElement.textContent = ` Panels left to click: ${clicked} / ${toclick}`; // Display the initial countdown time
 
-    const timerId = setInterval(() => {
-        timeLeft--;
-        countdownElement.textContent = `Time left until you can claim your reward: ${timeLeft} seconds`;
+    // const timerId = setInterval(() => {
+    //     timeLeft--;
+    //     countdownElement.textContent = `Time left until you can claim your reward: ${timeLeft} seconds`;
         
-        if (timeLeft <= 0) {
-            clearInterval(timerId);
-            countdownElement.textContent = "Time's up! You can claim your reward now.";
-            const rewardPoints = getRandomRewardPoints(); // Call the function to get the reward points
-            
-            const button = document.getElementById('claimRewardButton');
-            if (button) {
-                button.style.display = 'block'; // Show the button when time is up
-            }
-
-            button.addEventListener('click', () => {
-                document.getElementById('rewardMessage').textContent = `You get ${rewardPoints}!`;
-                button.style.display = 'none'; // Hide the button after claiming the reward
-                const image = document.getElementById('imageContainer');
-                const dialogueBox = document.getElementById('dialogueBox');
-                const mascotImage = document.getElementById('mascot');
-                if (image) {
-                    image.style.display = 'none'; // Hide the image after claiming the reward
-                }
-                if (countdownElement) {
-                    countdownElement.style.display = 'none'; // Hide the countdown text after claiming the reward
-                }
-                if (dialogueBox) {
-                    dialogueBox.style.display = 'none';
-                }
-                if (mascotImage) {
-                    mascotImage.style.display = 'none'; // Hide the mascot image after claiming the reward
-                }
-
-                if (rewards) {
-                    rewards.style.display = 'block'; // Show the rewards container after claiming the reward
-                }
-                
-            }
-            );
-            // gives element with id the text content with the reward.
+    if (clicked == toclick) {
+        countdownElement.textContent = "You can claim your reward now!";
+        const rewardPoints = getRandomRewardPoints(); // Call the function to get the reward points
+        
+        const button = document.getElementById('claimRewardButton');
+        if (button) {
+            button.style.display = 'block'; // Show the button when time is up
         }
-        
-    }, 1000);
-}
 
+        button.addEventListener('click', () => {
+            document.getElementById('rewardMessage').textContent = `You get ${rewardPoints}!`;
+            button.style.display = 'none'; // Hide the button after claiming the reward
+            const image = document.getElementById('imageContainer');
+            const dialogueBox = document.getElementById('dialogueBox');
+            const mascotImage = document.getElementById('mascot');
+            if (image) {
+                image.style.display = 'none'; // Hide the image after claiming the reward
+            }
+            if (countdownElement) {
+                countdownElement.style.display = 'none'; // Hide the countdown text after claiming the reward
+            }
+            if (dialogueBox) {
+                dialogueBox.style.display = 'none';
+            }
+            if (mascotImage) {
+                mascotImage.style.display = 'none'; // Hide the mascot image after claiming the reward
+            }
+
+            if (rewards) {
+                rewards.style.display = 'block'; // Show the rewards container after claiming the reward
+            }
+            
+        }
+        );
+        // gives element with id the text content with the reward.
+    }
+        
+    ;
+}
+//
+
+
+
+
+// This function generates a random reward based on the random number generated
 function getRandomRewardPoints() {
     const rewardType = Math.floor(Math.random() * 100) + 1; 
     if (rewardType <= 50) {
@@ -72,10 +82,9 @@ function getRandomRewardPoints() {
     }
 }
 
-//console.log('Reward points generated:', getRandomRewardPoints());
-timer();
+rewardGiveOut();
 
-/// area map code
+/// area map code for map areas and dialogue box
 const dialogueBox = document.getElementById('dialogueBox');
 const dialogueMessage = document.getElementById('dialogueMessage');
 const imageMap = document.querySelector('img[usemap="#image-map"]');
@@ -85,7 +94,8 @@ if (dialogueBox) {
     dialogueBox.style.display = 'none'; // Initially hide the dialogue box
 }
 
-function scaleMapAreas() {
+
+function scaleMapAreas() { // Function to scale the map areas based on the image size
     if (!imageMap || !imageMap.naturalWidth || !imageMap.naturalHeight) {
         return;
     }
@@ -111,6 +121,8 @@ function scaleMapAreas() {
     });
 }
 
+
+
 mapAreas.forEach((area) => {
     area.addEventListener('click', (event) => {
         event.preventDefault();
@@ -123,20 +135,42 @@ mapAreas.forEach((area) => {
 
         dialogueBox.style.display = 'block';
 
+        if (clicked < toclick ) {
         if (openedId === 'info1') {
             dialogueMessage.textContent = "This is the first area of the map. You can find various shops and restaurants here.";
+            clicked++; // Increment the clicked count when the first area is clicked
         } else if (openedId === 'info2') {
             dialogueMessage.textContent = "This is the second area of the map. It contains different points of interest.";
+            clicked++; // Increment the clicked count when the second area is clicked
         } else if (openedId === 'info3') {
             dialogueMessage.textContent = "This is the third area of the map. Explore more locations here.";
+            clicked++; // Increment the clicked count when the third area is clicked
+        }
+        const timeoutId = setTimeout(() => {
+        if (dialogueBox) {
+            dialogueBox.style.display = 'none'; // Hide the dialogue box after 5 seconds
+        }
+        }, 5000);}
+        else {
+            dialogueMessage.textContent = "You have already clicked the maximum number of areas. Please claim your reward.";
+            if (openedId === 'info1') {
+                dialogueMessage.textContent = "This is the first area of the map. You can find various shops and restaurants here.";
+            } else if (openedId === 'info2') {
+                dialogueMessage.textContent = "This is the second area of the map. It contains different points of interest.";
+            } else if (openedId === 'info3') {
+                dialogueMessage.textContent = "This is the third area of the map. Explore more locations here.";
+        }
         }
 
-        console.log('Dialog opened by:', openedId);
+        
+
+        rewardGiveOut(); // Call the function to update the countdown and check for reward eligibility
+
     });
 });
 
-if (imageMap.complete) {
-    scaleMapAreas();
+if (imageMap.complete) { // Check if the image is already loaded
+    scaleMapAreas(); // Call the function to scale the map areas immediately
 } else {
     imageMap.addEventListener('load', scaleMapAreas);
 }
